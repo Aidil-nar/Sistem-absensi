@@ -1,0 +1,402 @@
+1. Register Akun Baru
+Endpoint ini digunakan untuk memulai proses pendaftaran. Server akan memvalidasi data yang masuk, mengirimkan OTP ke email, dan mengembalikan token verifikasi sementara.
+
+URL : /api/register
+
+Method : POST
+
+Headers :
+
+Content-Type: application/json
+
+Accept: application/json
+
+Body Request
+{
+    "name": "SYBAUUUUU",
+    "email": "aidilnuradnan18@gmail.com",
+    "role": "Karyawan",
+    "password": "Password123!",
+    "password_confirmation": "Password123!"
+}
+
+✅ Respons Sukses (200 OK)
+Terjadi ketika semua data valid dan email OTP berhasil dikirim.
+
+{
+    "message": "Registrasi berhasil! Silakan cek email untuk kode verifikasi.",
+    "status": "sukses",
+    "registerResult": {
+        "email": "aidilnuradnan18@gmail.com",
+        "namaPelanggan": "SYBAUUUUU",
+        "token_verifikasi": "token",
+        "otp": "910462"
+    }
+}
+
+❌ Respons Error
+1. Validasi Gagal (422 Unprocessable Entity)
+Terjadi jika data yang dikirim tidak sesuai aturan (misalnya, email sudah terdaftar, password terlalu lemah, dll).
+
+Contoh: Email sudah dipakai
+
+{
+    "message": "Email sudah dipakai",
+    "errors": {
+        "email": [
+            "Email sudah dipakai"
+        ]
+    }
+}
+
+Contoh: Password tidak valid
+
+{
+    "message": "The password field must contain at least one uppercase and one lowercase letter.",
+    "errors": {
+        "password": [
+            "The password field must contain at least one uppercase and one lowercase letter."
+        ]
+    }
+}
+
+2. Gagal Mengirim Email (500 Internal Server Error)
+Terjadi jika ada masalah pada server email.
+
+{
+    "status": "error",
+    "message": "Gagal mengirim email verifikasi."
+}
+
+
+2. Verifikasi OTP
+Endpoint ini digunakan untuk memvalidasi OTP yang diterima pengguna dan menyelesaikan proses registrasi.
+
+URL : /api/verify-otp
+
+Method : POST
+
+Headers :
+
+Authorization: Bearer {token_verifikasi}
+
+Content-Type: application/json
+
+Accept: application/json
+
+Body Request
+{
+   "otp": "910462"
+}
+
+✅ Respons Sukses (201 Created)
+Terjadi ketika OTP dan token valid. Akun pengguna berhasil dibuat di database.
+
+{
+    "status": "success",
+    "message": "Registrasi berhasil. Anda sekarang bisa login.",
+    "data": {
+        "name": "SYBAUUUUU",
+        "email": "aidilnuradnan18@gmail.com",
+        "role": "Karyawan",
+        "updated_at": "2025-08-29T04:15:55.000000Z",
+        "created_at": "2025-08-29T04:15:55.000000Z",
+        "id": 18
+    }
+}
+
+❌ Respons Error
+1. Token Tidak Ditemukan (401 Unauthorized)
+Terjadi jika header Authorization tidak disertakan.
+
+{
+    "status": "error",
+    "message": "Token verifikasi tidak ditemukan di header."
+}
+
+2. OTP atau Token Salah (422 Unprocessable Entity)
+Terjadi jika OTP yang dikirim salah, atau token sudah kedaluwarsa/tidak valid.
+
+{
+    "status": "error",
+    "message": "Kode OTP tidak valid atau token telah kedaluwarsa."
+}
+
+3. Kirim Ulang OTP
+Endpoint ini digunakan jika pengguna tidak menerima OTP dan ingin meminta yang baru.
+
+URL : /api/resend-otp
+
+Method : POST
+
+Headers :
+
+Authorization: Bearer {token_verifikasi}
+
+Accept: application/json
+
+Body Request
+(Tidak memerlukan body)
+
+✅ Respons Sukses (200 OK)
+Terjadi ketika token valid dan email OTP baru berhasil dikirim.
+
+{
+    "message": "Kode OTP berhasil dikirim ulang.",
+    "status": "sukses",
+    "resendResult": {
+        "email": "aidilnuradnan18@gmail.com",
+        "otp": "654321",
+        "token_verifikasi": "token"
+    }
+}
+
+❌ Respons Error
+1. Token Tidak Ditemukan (401 Unauthorized)
+Terjadi jika header Authorization tidak disertakan.
+
+{
+    "message": "Token verifikasi tidak ditemukan di header.",
+    "status": "error"
+}
+
+2. Token Tidak Valid (400 Bad Request)
+Terjadi jika token di header sudah kedaluwarsa atau tidak ditemukan di cache.
+
+{
+    "message": "Token verifikasi tidak valid atau telah kedaluwarsa.",
+    "status": "error"
+}
+
+3. Gagal Mengirim Email (500 Internal Server Error)
+Terjadi jika ada masalah pada server email.
+
+{
+    "status": "error",
+    "message": "Gagal mengirim ulang email verifikasi."
+}
+
+1. Login Pengguna
+Endpoint ini digunakan untuk mengautentikasi pengguna yang sudah terdaftar dan mendapatkan token akses untuk sesi mereka.
+
+URL : /api/login
+
+Method : POST
+
+Headers :
+
+Content-Type: application/json
+
+Accept: application/json
+
+Body Request
+{
+    "email": "aidilnuradnan18@gmail.com",
+    "password": "Password123!"
+}
+
+✅ Respons Sukses (200 OK)
+Terjadi ketika email dan password yang diberikan cocok. Server akan mengembalikan data pengguna beserta token akses baru.
+
+{
+    "status": "success",
+    "message": "Login berhasil",
+    "data": {
+        "user": {
+            "id": 18,
+            "nik": null,
+            "name": "SYBAUUUUU",
+            "email": "aidilnuradnan18@gmail.com",
+            "email_verified_at": null,
+            "is_active": 0,
+            "role": "Karyawan",
+            "created_at": "2025-08-29T04:15:55.000000Z",
+            "updated_at": "2025-08-29T04:15:55.000000Z"
+        },
+        "token": "token"
+    }
+}
+
+❌ Respons Error
+1. Kredensial Salah (401 Unauthorized)
+Terjadi jika kombinasi email dan password tidak cocok dengan data yang ada di database.
+
+{
+    "status": "error",
+    "message": "Email atau Password yang diberikan salah."
+}
+
+2. Validasi Gagal (422 Unprocessable Entity)
+Terjadi jika salah satu atau kedua field (email, password) tidak dikirimkan dalam body request.
+
+{
+    "message": "The email field is required.",
+    "errors": {
+        "email": [
+            "The email field is required."
+        ]
+    }
+}
+
+2. Logout Pengguna
+Endpoint ini digunakan untuk menghapus token akses pengguna saat ini, secara efektif mengakhiri sesi mereka. Endpoint ini harus diakses dengan token yang valid.
+
+URL : /api/logout
+
+Method : POST
+
+Headers :
+
+Authorization: Bearer {token_akses_dari_login}
+
+Accept: application/json
+
+Body Request
+(Tidak memerlukan body)
+
+✅ Respons Sukses (200 OK)
+Terjadi ketika token yang diberikan valid dan berhasil dihapus dari server.
+
+{
+    "status": "success",
+    "message": "Logout berhasil"
+}
+
+❌ Respons Error
+1. Tidak Terautentikasi (401 Unauthorized)
+Terjadi jika permintaan dikirim tanpa Bearer Token yang valid di header Authorization.
+
+{
+    "message": "Unauthenticated."
+}
+
+
+Dokumentasi API - Absensi Pengguna
+Dokumen ini menjelaskan alur kerja untuk fitur absensi. Semua endpoint di bawah ini memerlukan otentikasi.
+
+1. Absen Masuk (Clock In)
+Mencatat waktu kehadiran pengguna.
+
+URL : /api/absensi/masuk
+
+Method : POST
+
+Headers :
+
+Authorization: Bearer {token_akses_dari_login}
+
+Accept: application/json
+
+Body Request
+PENTING: Karena ada upload file, gunakan form-data di Postman, bukan raw (JSON).
+
+office_id : 1(text)
+
+latitude : (Teks) 3.59413.
+
+longitude : (Teks) 98.60914.
+
+photo : (File) File gambar/foto selfie.
+
+{
+    "status": "success",
+    "message": "Absen masuk berhasil dicatat.",
+    "data": {
+        "user_id": 18,
+        "office_id": "1",
+        "check_in_time": "2025-08-29T05:02:01.000000Z",
+        "check_in_latitude": "3.59413",
+        "check_in_longitude": "98.60914",
+        "check_in_photo": "check_in_photos/LR4a2x0mc03kyHO8FDpbDEdSJT0VriqVjL3vYRla.png",
+        "status": "On Time",
+        "updated_at": "2025-08-29T05:02:01.000000Z",
+        "created_at": "2025-08-29T05:02:01.000000Z",
+        "id": 1
+    }
+}
+❌ Respons Error
+409 Conflict: Jika sudah absen masuk hari ini.
+
+{
+    "status": "error",
+    "message": "Anda sudah melakukan absen masuk hari ini."
+}
+
+422 Unprocessable Entity: Jika ada data yang kurang (misal: foto tidak ada).
+
+{
+    "message": "The photo field is required.",
+    "errors": {
+        "photo": [
+            "The photo field is required."
+        ]
+    }
+}
+
+2. Absen Pulang (Clock Out)
+Mencatat waktu pulang pengguna.
+
+URL : /api/absensi/pulang
+
+Method : POST
+
+Headers :
+
+Authorization: Bearer {token_akses_dari_login}
+
+Accept: application/json
+
+Body Request
+Gunakan form-data di Postman.
+
+latitude : 3.59413
+
+longitude : (Teks) 98.60914.
+
+photo : (File) File gambar/foto selfie.
+
+✅ Respons Sukses (200 OK)
+{
+    "status": "success",
+    "message": "Absen pulang berhasil dicatat.",
+    "data": {
+        "id": 1,
+        "user_id": 18,
+        "office_id": 1,
+        "check_in_time": "2025-08-29T05:02:01.000000Z",
+        "check_in_latitude": "3.59413",
+        "check_in_longitude": "98.60914",
+        "check_in_photo": "check_in_photos/LR4a2x0mc03kyHO8FDpbDEdSJT0VriqVjL3vYRla.png",
+        "check_out_time": "2025-08-29T05:05:32.000000Z",
+        "check_out_latitude": "3.59413",
+        "check_out_longitude": "98.60914",
+        "check_out_photo": "check_out_photos/66sdSZmbjfFsm19DQRvkXV6ggnKT2uWtYT4eEHWI.png",
+        "status": "On Time",
+        "created_at": "2025-08-29T05:02:01.000000Z",
+        "updated_at": "2025-08-29T05:05:32.000000Z"
+    }
+}
+
+❌ Respons Error
+400 Bad Request: Jika mencoba absen pulang sebelum absen masuk.
+
+{
+    "status": "error",
+    "message": "Anda harus melakukan absen masuk terlebih dahulu."
+}
+
+409 Conflict: Jika sudah absen pulang hari ini.
+
+{
+    "status": "error",
+    "message": "Anda sudah melakukan absen pulang hari ini."
+}
+
+
+
+
+
+
+
+
+
