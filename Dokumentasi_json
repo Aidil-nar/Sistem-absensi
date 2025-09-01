@@ -392,6 +392,58 @@ photo : (File) File gambar/foto selfie.
     "message": "Anda sudah melakukan absen pulang hari ini."
 }
 
+Riwayat Absensi
+URL : http://127.0.0.1:8000/api/absensi/riwayat
+
+Method : GET
+
+Query Parameters (Opsional)
+/absensi/riwayat?bulan=8&tahun=2025
+
+✅ Respons Sukses (200 OK)
+{
+    "status": "success",
+    "message": "Riwayat absensi berhasil diambil.",
+    "data": [
+        {
+            "id": 1,
+            "user_id": 18,
+            "office_id": 1,
+            "check_in_time": "2025-08-29T05:02:01.000000Z",
+            "check_in_latitude": "3.59413",
+            "check_in_longitude": "98.60914",
+            "check_in_photo": "check_in_photos/LR4a2x0mc03kyHO8FDpbDEdSJT0VriqVjL3vYRla.png",
+            "check_out_time": "2025-08-29T05:05:32.000000Z",
+            "check_out_latitude": "3.59413",
+            "check_out_longitude": "98.60914",
+            "check_out_photo": "check_out_photos/66sdSZmbjfFsm19DQRvkXV6ggnKT2uWtYT4eEHWI.png",
+            "status": "On Time",
+            "created_at": "2025-08-29T05:02:01.000000Z",
+            "updated_at": "2025-08-29T05:05:32.000000Z"
+        }
+    ]
+}
+
+❌ Respons Error
+422 Unprocessable Entity: Jika parameter filter tidak valid (contoh: ?bulan=13).
+
+{
+    "message": "The selected bulan is invalid.",
+    "errors": {
+        "bulan": [
+            "The selected bulan is invalid."
+        ]
+    }
+}
+
+401 Unauthorized: Jika token tidak valid atau tidak disertakan.
+
+{
+    "message": "Unauthenticated."
+}
+
+
+
 
 
 
