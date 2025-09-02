@@ -329,7 +329,6 @@ Accept: application/json
 Body Request
 PENTING: Karena ada upload file, gunakan form-data di Postman, bukan raw (JSON).
 
-office_id : 1(text)
 
 latitude : (Teks) 3.59413.
 
@@ -480,6 +479,7 @@ Query Parameters (Opsional)
 {
     "message": "Unauthenticated."
 }
+
 
 
 
