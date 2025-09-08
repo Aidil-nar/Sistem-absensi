@@ -119,3 +119,140 @@ Respons Gagal (403 Forbidden - Akun Belum Aktif):
     "message": "Akun Anda belum aktif. Silakan hubungi administrator."
 }
 
+2. Absensi (AttendanceController)
+Endpoint yang berkaitan dengan pencatatan kehadiran (clock-in dan clock-out) serta riwayat absensi.
+
+POST /absensi/masuk
+Deskripsi: Mencatat waktu kehadiran (masuk) pengguna. Membutuhkan data lokasi dan foto. Request harus dalam format multipart/form-data.
+
+Body Request (multipart/form-data):
+
+latitude (numeric): Garis lintang lokasi pengguna.
+
+longitude (numeric): Garis bujur lokasi pengguna.
+
+photo (file): File gambar (jpg, png) sebagai bukti kehadiran.
+
+<details>
+<summary><strong>Contoh Respons</strong></summary>
+
+Respons Sukses (201 Created):
+
+{
+    "status": "success",
+    "message": "Absen masuk berhasil dicatat. Status Anda: Late",
+    "data": {
+        "user_id": 7,
+        "office_id": 1,
+        "check_in_time": "2025-09-08T06:41:08.000000Z",
+        "check_in_latitude": "3.526875",
+        "check_in_longitude": "98.611233",
+        "check_in_photo": "check_in_photos/drkRYO3Lim3T8PoYWcs9w7x9nvR7UczJDQQ5wyxR.png",
+        "status": "Late",
+        "updated_at": "2025-09-08T06:41:08.000000Z",
+        "created_at": "2025-09-08T06:41:08.000000Z",
+        "id": 2
+    }
+}
+Respons Gagal (409 Conflict - Sudah Clock In):
+
+{
+    "message": "Anda sudah melakukan absen masuk hari ini."
+}
+
+
+Respons Gagal (422 Unprocessable Entity - Di Luar Radius):
+
+{
+    "message": "Anda berada di luar radius lokasi kantor yang diizinkan."
+}
+
+
+
+POST /absensi/pulang
+Deskripsi: Mencatat waktu kepulangan (pulang) pengguna. Request harus dalam format multipart/form-data.
+
+Body Request (multipart/form-data):
+
+latitude (numeric): Garis lintang lokasi pengguna.
+
+longitude (numeric): Garis bujur lokasi pengguna.
+
+photo (file): File gambar (jpg, png) sebagai bukti kepulangan.
+
+Respons Sukses (200 OK):
+
+{
+    "status": "success",
+    "message": "Absen pulang berhasil dicatat.",
+    "data": {
+        "id": 2,
+        "user_id": 7,
+        "office_id": 1,
+        "check_in_time": "2025-09-08T06:41:08.000000Z",
+        "check_in_latitude": "3.526875",
+        "check_in_longitude": "98.611233",
+        "check_in_photo": "check_in_photos/drkRYO3Lim3T8PoYWcs9w7x9nvR7UczJDQQ5wyxR.png",
+        "check_out_time": "2025-09-08T06:41:57.000000Z",
+        "check_out_latitude": "3.526875",
+        "check_out_longitude": "98.611233",
+        "check_out_photo": "check_out_photos/194CWZlHgkYMGqN6rirhSr6QkvLIKmByYulijFDT.png",
+        "status": "Late",
+        "created_at": "2025-09-08T06:41:08.000000Z",
+        "updated_at": "2025-09-08T06:41:57.000000Z"
+    }
+}
+Respons Gagal (400 Bad Request - Belum Clock In):
+{
+    "message": "Anda harus melakukan absen masuk terlebih dahulu."
+}
+
+Respons Gagal (409 Conflict - Sudah Clock Out):
+{
+    "message": "Anda sudah melakukan absen pulang hari ini."
+}
+
+
+
+
+
+GET /history
+Deskripsi: Mengambil riwayat absensi pengguna dengan filter opsional berdasarkan tanggal, bulan, atau tahun.
+
+Query Parameters:
+
+tanggal (opsional, format: YYYY-MM-DD): Untuk mengambil data pada tanggal spesifik.
+
+bulan (opsional, numeric: 1-12): Untuk mengambil data pada bulan tertentu.
+
+tahun (opsional, numeric: 2020-dst): Untuk mengambil data pada tahun tertentu.
+
+Contoh URL: /api/history?bulan=9&tahun=2025
+
+<details>
+<summary><strong>Contoh Respons</strong></summary>
+
+Respons Sukses (200 OK):
+
+{
+    "status": "success",
+    "message": "Riwayat absensi berhasil diambil.",
+    "data": [
+        {
+            "id": 101,
+            "user_id": 15,
+            "check_in_time": "2025-09-08T08:15:00.000000Z",
+            "check_out_time": "2025-09-08T17:05:00.000000Z",
+            "status": "On Time",
+            // ...
+        },
+        {
+            "id": 100,
+            "user_id": 15,
+            "check_in_time": "2025-09-07T08:30:00.000000Z",
+            "check_out_time": "2025-09-07T17:00:00.000000Z",
+            "status": "Late",
+            // ...
+        }
+    ]
+}
