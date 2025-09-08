@@ -227,8 +227,7 @@ bulan (opsional, numeric: 1-12): Untuk mengambil data pada bulan tertentu.
 
 tahun (opsional, numeric: 2020-dst): Untuk mengambil data pada tahun tertentu.
 
-Contoh URL: /api/history?bulan=9&tahun=2025
-
+Contoh URL:http://127.0.0.1:8000/api/absensi/riwayat?tanggal=2025-09-08&bulan=9&tahun=2025
 <details>
 <summary><strong>Contoh Respons</strong></summary>
 
