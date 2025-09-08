@@ -255,3 +255,17 @@ Respons Sukses (200 OK):
         }
     ]
 }
+
+POST /leaves
+Kegunaan: Endpoint ini digunakan oleh pengguna (karyawan) untuk mengirimkan formulir pengajuan izin baru, seperti sakit, izin keperluan pribadi, atau alasan lainnya.
+
+Method: POST
+
+URL: /api/leaves
+
+Otentikasi: Perlu Authorization: Bearer {token}.
+
+
+Body Request
+format multipart/form-data. Berikut adalah field yang dibutuhkan:
+
